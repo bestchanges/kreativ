@@ -1,0 +1,1 @@
+export { EthLogo } from './EthLogo'

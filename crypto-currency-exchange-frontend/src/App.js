@@ -1,21 +1,33 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { Layout, Col } from 'antd'
+import styled from 'styled-components'
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
-  }
-}
+import { SellerBuyer } from './Pages'
 
-export default App;
+const Logo = styled.span`
+  font-size: 2rem;
+  font-family: futura;
+  color: #fff;
+`
+
+const WhiteSpace = styled.div`
+  padding: 1rem 0;
+`
+
+const App = () =>
+  <Router>
+    <div className='app'>
+      <Layout.Header>
+        <Logo>Creative</Logo>
+      </Layout.Header>
+      <WhiteSpace />
+      <Col offset={1} span={22}>
+        <Layout>
+          <Route path='/' component={SellerBuyer} />
+        </Layout>
+      </Col>
+    </div>
+  </Router>
+
+export default App
