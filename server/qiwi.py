@@ -1,32 +1,64 @@
+import time
 import requests
-from flask import request, jsonify, app
+from flask import request, jsonify
 import uuid
+
 from app import mongo, app as a
 
 
-def get_qiwi_balance(token, phone):
+@a.route('/getbalanceqiwi', methods=['POST'], endpoint='get_balance')
+def get_balance():
+    json_data = request.get_json()
+    qiwi_token = json_data.get('token', '')
+    phone = json_data.get('phone', '')
     api_url = 'https://edge.qiwi.com/funding-sources/v2/persons/' + phone + '/accounts'
 
     headers = {'Content-Type': 'application/json',
                'Accept': 'application/json',
-               'Authorization': 'Bearer ' + token}
+               'Authorization': 'Bearer ' + qiwi_token}
 
     response = requests.get(api_url, headers=headers)
 
     if response.status_code == 200:
         data = response.json()
         for c in data['accounts']:
-            if c['hasBalance']:
-                return c['balance']['amount']
-            else:
-                print('no balance')
-                return None
+            return c['balance']['amount']
     else:
         print('[!] HTTP {0} calling [{1}]'.format(response.status_code, api_url))
-        return None
+        return response.json()
 
-@a.route('/createaccountqiwi', methods=['POST'])
-def createaccountqiwi():
+
+@a.route('/sendmoneyqiwi', methods=['POST'], endpoint='send_money')
+def send_money(token, phone, amount):
+    api_url = 'https://edge.qiwi.com/sinap/api/v2/terms/99/payments'
+
+    headers = {'Content-Type': 'application/json',
+               'Accept': 'application/json',
+               'Authorization': 'Bearer ' + token}
+
+    id = round(time.time() * 100000)
+    print(id)
+    data = {'id': str(id),
+            'sum': {
+                'amount': amount,
+                'currency': '643'},
+            'paymentMethod': {
+                'type': 'Account',
+                'accountId': '643'},
+            'comment': 'test',
+            'fields': {
+                'account': phone}}
+
+    response = requests.post(api_url, headers=headers, json=data)
+
+    if response.status_code == 200:
+        print('ok')
+    else:
+        print(response.json())
+
+
+@a.route('/createaccountqiwi', methods=['POST'], endpoint='create_account')
+def create_account():
     json_data = request.get_json()
     qiwi_token = json_data.get('token', '')
     phone = json_data.get('phone', '')
@@ -45,35 +77,4 @@ def createaccountqiwi():
                     'uuid': acc_uuid})
 
 
-@a.route('/sendqiwimoney', methods=['POST'])
-def send_money(token, phone):
-    api_url = 'https://edge.qiwi.com/sinap/api/v2/terms/99/payments'
 
-    headers = {'Content-Type': 'application/json',
-               'Accept': 'application/json',
-               'Authorization': 'Bearer ' + token}
-    body = {
-        "id": "11111111111111",
-        "sum": {
-            "amount": 10,
-            "currency": "643"
-        },
-        "paymentMethod": {
-            "type": "Account",
-            "accountId": "643"
-        },
-        "comment": "test",
-        "fields": {
-            "account": phone
-        }
-    }
-
-    response = requests.get(api_url, headers=headers, body=body)
-
-
-
-tkn = '7820a390d136f825461739c26ae7324b'
-
-phn = '79636853224'
-
-print(get_qiwi_balance(tkn, phn))
