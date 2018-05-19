@@ -11,5 +11,7 @@ def hello_world():
     data = {
         'name' : name,
     }
-    account = mongo.db.account.add(data)
+    account = mongo.db.account.insert(data)
     return jsonify({'result': "OK"})
+
+import eth
