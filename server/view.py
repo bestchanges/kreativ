@@ -37,15 +37,28 @@ def send_money_qiwi():
         return response.text
 
 
-@a.route('/createaccountqiwi', methods=['POST'], endpoint='create_account_qiwi')
-def create_account_qiwi():
+@a.route('/createaccount', methods=['POST'], endpoint='create_accounts')
+def create_accounts():
+
+    #создание аккаунтов
+
+
+
     json_data = request.get_json()
     qiwi_token = json_data.get('token', '')
     phone = json_data.get('phone', '')
+    wallet = json_data.get('wallet', '')
+
     balance = get_balance(qiwi_token, phone)
     if not isinstance(balance, float):
         return balance
-    data = create_wallet(phone, 'RUR QIWI', balance, '', qiwi_token)
+
+    data_qiwi = create_wallet(phone, 'RUR QIWI', balance, '', qiwi_token, phone)
+
+    data_eth = create_eth_wallet()
+
+    data_eth = create_wallet(wallet, 'ETH', '', data_eth['private_key'], '', data_eth['address'])
+
     return jsonify({'result': "OK",
                     'uuid': data['account_uuid']})
 
