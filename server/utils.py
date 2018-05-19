@@ -100,6 +100,12 @@ def check_account_balance():
     balance = web3.eth.getBalance(a.address)
     print(balance)
 
+def get_eth_balance(adress):
+    # check account balance
+    #balance = web3.eth.getBalance("0x9Ba88a8BB6De98edB63a6066A7c7938Cdc4793E7")
+    balance = web3.eth.getBalance(a.address)
+    return balance
+
 
 def send_tr():
     # send transaction
@@ -125,12 +131,17 @@ def send_tr():
 # http://web3py.readthedocs.io/en/stable/web3.eth.html#web3.eth.Eth.estimateGas
 
 
-def create_account(phone):
+def create_account(qiwi_address, ethereum_address):
 
     acc_uuid = uuid.uuid4()
 
     data = {
-        'phone': phone,
-        'uuid': uuid.uuid4()
+        'ethereum_address': ethereum_address,
+        'qiwi_address': qiwi_address,
+        'uuid': acc_uuid
     }
+
+    mongo.db.account.insert(data)
+
+    return acc_uuid
 
