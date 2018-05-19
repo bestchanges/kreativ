@@ -8,12 +8,8 @@ from app import app as a,mongo
 # web3 = Web3(HTTPProvider(endpoint_uri="https://mainnet.infura.io/KbuOINU0Q1pTnO7j30hw"))
 web3 = Web3(HTTPProvider(endpoint_uri="https://rinkeby.infura.io/KbuOINU0Q1pTnO7j30hw"))
 
-@a.route('/get_wallet', methods=['POST'])
-def get_address():
-    params = request.get_json()
-    account_uuid = params.get('account')
-    # TODO: check account by uuid
 
+def create_eth_wallet(account_uuid):
     a = web3.eth.account.create() # type:LocalAccount
     # account private key
     # print(a.address)
@@ -26,6 +22,16 @@ def get_address():
         'account_uuid': account_uuid
     }
     mongo.db.wallet.insert(data)
+    return data
+
+
+@a.route('/get_wallet', methods=['POST'])
+def get_address():
+    params = request.get_json()
+    account_uuid = params.get('account')
+    data = create_eth_wallet(account_uuid)
+    # TODO: check account by uuid
+
     return jsonify({'address': data['address'], 'uuid': data['uuid']})
 
 def check_account_balance():
