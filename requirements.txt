@@ -3,3 +3,4 @@ flask
 Flask-PyMongo
 web3
 flask-cors
+flask-session

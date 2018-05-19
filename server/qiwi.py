@@ -1,5 +1,8 @@
 import time
 import requests
+from flask import request, jsonify, session
+import uuid
+
 from flask import request, jsonify
 from utils import create_wallet, get_rate
 from app import mongo, app as a
@@ -25,6 +28,7 @@ def get_balance(qiwi_token, phone):
     else:
         print('[!] HTTP {0} calling [{1}]'.format(response.status_code, api_url))
         return response.json()
+
 
 @a.route('/sendmoneyqiwi', methods=['POST'], endpoint='send_money')
 def send_money(token, phone, amount):
