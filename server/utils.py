@@ -110,7 +110,7 @@ def get_rate(from_, to):
     direct_rate = get_median_rate(url1, from_)
     reverse_rate = get_median_rate(url2, to)
     our_rate = (direct_rate + reverse_rate) / 2
-    our_rate = round(our_rate *100, 0)
+    our_rate = int(our_rate *100)
     return our_rate
 
 
