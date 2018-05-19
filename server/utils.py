@@ -1,17 +1,23 @@
+from web3 import Web3, HTTPProvider
+from app import app as a,mongo
+import uuid
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
-from flask import jsonify
-
-from app import app as a
+web3 = Web3(HTTPProvider(endpoint_uri="https://rinkeby.infura.io/KbuOINU0Q1pTnO7j30hw"))
 
 
-@a.route('/get_rates', methods=['GET'], endpoint='get_rates')
-def get_rates():
-    qw_eth = get_rate('https://www.bestchange.ru/qiwi-to-ethereum.html')
-    eth_qw = get_rate('https://www.bestchange.ru/ethereum-to-qiwi.html')
-    return jsonify({'qw_eth': qw_eth,
-                    'eth_qw': eth_qw})
+def create_wallet(account_uuid, currency, balance, privateKey, api_token):
+    data = {
+        'uuid': uuid.uuid4(),
+        'private_key': privateKey,
+        'account_uuid': account_uuid,
+        'currency': currency,
+        'balance': balance,
+        'api_token': api_token
+    }
+    mongo.db.wallet.insert(data)
+    return data
 
 
 

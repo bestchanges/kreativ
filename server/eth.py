@@ -1,5 +1,4 @@
 import uuid
-
 from eth_account.local import LocalAccount
 from flask import request, jsonify
 from web3 import Web3, HTTPProvider
@@ -34,11 +33,13 @@ def get_address():
 
     return jsonify({'address': data['address'], 'uuid': data['uuid']})
 
+
 def check_account_balance():
     # check account balance
     #balance = web3.eth.getBalance("0x9Ba88a8BB6De98edB63a6066A7c7938Cdc4793E7")
     balance = web3.eth.getBalance(a.address)
     print(balance)
+
 
 def send_tr():
     # send transaction
