@@ -18,5 +18,4 @@ def hello_world():
     account = mongo.db.account.insert(data)
     return jsonify({'result': "OK"})
 
-import eth
-import qiwi
+import view
