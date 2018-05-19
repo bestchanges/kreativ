@@ -1,6 +1,6 @@
 import time
 from utils import *
-from flask import request, jsonify, session
+from flask import request, jsonify
 from app import app as a
 
 

@@ -8,6 +8,7 @@ from urllib.request import urlopen
 web3 = Web3(HTTPProvider(endpoint_uri="https://rinkeby.infura.io/KbuOINU0Q1pTnO7j30hw"))
 
 
+
 # @a.route('/getbalanceqiwi', methods=['POST'], endpoint='get_balance')
 def get_balance(qiwi_token, phone):
     # json_data = request.get_json()
@@ -80,20 +81,31 @@ def get_median_rate(url, currency):
     return s
 
 
-def get_rate(from_, to):
-    pair_string = "{}/{}".format(from_, to)
-    if from_ == 'ETH' and to == 'RUB (QIWI)':
-        url1 = 'https://www.bestchange.ru/ethereum-to-qiwi.html'
-        url2 = 'https://www.bestchange.ru/qiwi-to-ethereum.html'
-    else:
-        raise Exception("Unexpected pair {}/{}".format(from_, to))
 
-    direct_rate = get_median_rate(url1, from_)
-    reverse_rate = get_median_rate(url2, to)
-    our_rate = (direct_rate + reverse_rate) / 2
-    our_rate = round(our_rate, 2)
-    print(our_rate)
-    return our_rate
+def get_rate(from_, to):
+
+
+    global our_rate
+
+    try:
+        return our_rate
+    except Exception:
+        if from_ == 'ETH' and to == 'RUB (QIWI)':
+            url1 = 'https://www.bestchange.ru/ethereum-to-qiwi.html'
+            url2 = 'https://www.bestchange.ru/qiwi-to-ethereum.html'
+        else:
+            raise Exception("Unexpected pair {}/{}".format(from_, to))
+
+        direct_rate = get_median_rate(url1, from_)
+        reverse_rate = get_median_rate(url2, to)
+        our_rate = (direct_rate + reverse_rate) / 2
+        our_rate = round(our_rate, 2)
+
+        return our_rate
+
+
+
+
 
 
 def create_eth_wallet():
