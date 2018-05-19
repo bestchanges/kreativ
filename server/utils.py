@@ -1,12 +1,24 @@
 import requests
+from flask_pymongo import MongoClient
 from web3 import Web3, HTTPProvider
-from app import app as a, mongo
+from app import mongo
 import uuid
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
 web3 = Web3(HTTPProvider(endpoint_uri="https://rinkeby.infura.io/KbuOINU0Q1pTnO7j30hw"))
 
+RUB_QIWI = 'RUB (QIWI)'
+ETH = 'ETH'
+
+#mongo = MongoClient()
+
+def list_accounts():
+    result = mongo.db.account.find()
+    accounts = []
+    for account in result:
+        accounts.add(account)
+    return accounts
 
 
 # @a.route('/getbalanceqiwi', methods=['POST'], endpoint='get_balance')
@@ -27,8 +39,8 @@ def get_balance(qiwi_token, phone):
         for c in data['accounts']:
             return c['balance']['amount']
     else:
-        print('[!] HTTP {0} calling [{1}]'.format(response.status_code, api_url))
-        return response.json()
+        # response['message']
+        raise Exception("Error getting balance")
 
 
 def create_wallet(account_uuid, currency, balance, privateKey, api_token, address):
@@ -81,25 +93,25 @@ def get_median_rate(url, currency):
     return s
 
 
+our_rate = None
+
 def get_rate(from_, to):
 
     global our_rate
-
-    try:
+    if our_rate is not None:
         return our_rate
-    except Exception:
-        if from_ == 'ETH' and to == 'RUB (QIWI)':
-            url1 = 'https://www.bestchange.ru/ethereum-to-qiwi.html'
-            url2 = 'https://www.bestchange.ru/qiwi-to-ethereum.html'
-        else:
-            raise Exception("Unexpected pair {}/{}".format(from_, to))
 
-        direct_rate = get_median_rate(url1, from_)
-        reverse_rate = get_median_rate(url2, to)
-        our_rate = (direct_rate + reverse_rate) / 2
-        our_rate = round(our_rate, 2)
+    if from_ == ETH and to == RUB_QIWI:
+        url1 = 'https://www.bestchange.ru/ethereum-to-qiwi.html'
+        url2 = 'https://www.bestchange.ru/qiwi-to-ethereum.html'
+    else:
+        raise Exception("Unexpected pair {}/{}".format(from_, to))
 
-        return our_rate
+    direct_rate = get_median_rate(url1, from_)
+    reverse_rate = get_median_rate(url2, to)
+    our_rate = (direct_rate + reverse_rate) / 2
+    our_rate = round(our_rate, 2)
+    return our_rate
 
 
 
@@ -115,18 +127,15 @@ def create_eth_wallet():
     return data
 
 
-def check_account_balance():
+def check_account_balance(address):
     # check account balance
-    # balance = web3.eth.getBalance("0x9Ba88a8BB6De98edB63a6066A7c7938Cdc4793E7")
-    balance = web3.eth.getBalance(a.address)
+    balance = web3.eth.getBalance(address)
+    # balance = web3.eth.getBalance(a.address)
     print(balance)
 
 
 def get_eth_balance(adress):
-    # check account balance
-    # balance = web3.eth.getBalance("0x9Ba88a8BB6De98edB63a6066A7c7938Cdc4793E7")
-    balance = web3.eth.getBalance(a.address)
-    return balance
+    return check_account_balance(adress)
 
 
 def send_tr():
@@ -153,16 +162,42 @@ def send_tr():
 # gas price
 # http://web3py.readthedocs.io/en/stable/web3.eth.html#web3.eth.Eth.estimateGas
 
-
-def create_account(qiwi_address, ethereum_address):
+def create_account(name, qiwi_address, ethereum_address = None, qiwi_token = None, ethereum_private_key = None):
     acc_uuid = uuid.uuid4()
 
     data = {
         'ethereum_address': ethereum_address,
         'qiwi_address': qiwi_address,
-        'uuid': acc_uuid
+        'uuid': acc_uuid,
+        'name': name,
     }
 
     mongo.db.account.insert(data)
 
+    balance = get_balance(qiwi_token, qiwi_address)
+    if not isinstance(balance, float):
+        return balance
+
+    data_qiwi = create_wallet(acc_uuid, RUB_QIWI, balance, '', qiwi_token, qiwi_address)
+
+    data_eth = create_eth_wallet()
+    eth_close_address = data_eth['private_key']
+    # ДОПИЛИТЬ - ПРЛУЧИТЬ БАЛАНС КРИПТЫ
+    # balance = get_eth_balance(eth_close_address)
+    data_eth = create_wallet(acc_uuid, ETH, balance, eth_close_address, '', ethereum_address)
+
+
     return acc_uuid
+
+
+def create_sample_accounts():
+    # bob sell ETH
+    # alice buy ETH
+    create_account(
+        "ALICE",
+        qiwi_address="",
+        qiwi_token="cfa7547d48913cee745395c2a7f0de4d",
+        ethereum_address="0x6afCFCEc1e595cd4D43e4c1D69e4590DC1944B29",
+    )
+    create_account("BOB", )
+

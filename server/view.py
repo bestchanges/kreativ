@@ -3,6 +3,10 @@ from utils import *
 from flask import request, jsonify
 from app import app as a
 
+@a.route('/list_accounts', methods=['POST', 'GET'])
+def list_accounts():
+    accounts = mongo.db.account.find()
+    return jsonify(accounts)
 
 @a.route('/sendmoneyqiwi', methods=['POST'], endpoint='send_money_qiwi')
 def send_money_qiwi():
@@ -45,28 +49,18 @@ def create_accounts():
     qiwi_address = json_data.get('qiwi_address', '')
     ethereum_address = json_data.get('ethereum_address', '')
 
-    acc_uuid = create_account(qiwi_address, ethereum_address)
-
-    balance = get_balance(qiwi_token, qiwi_address)
-    if not isinstance(balance, float):
-        return balance
-
-    data_qiwi = create_wallet(acc_uuid, 'RUR QIWI', balance, '', qiwi_token, qiwi_address)
-
-    data_eth = create_eth_wallet()
-    eth_close_address = data_eth['private_key']
-    # ДОПИЛИТЬ - ПРЛУЧИТЬ БАЛАНС КРИПТЫ
-    # balance = get_eth_balance(eth_close_address)
-    data_eth = create_wallet(acc_uuid, 'ETH', balance, eth_close_address, '', ethereum_address)
+    acc_uuid = create_account("account", qiwi_address, ethereum_address, qiwi_token)
+    data_eth = []
+    data_qiwi = []
 
     return jsonify({'uuid': acc_uuid,
-                    'wallets': {'ETH': data_eth,
-                                'RUB (QIWI)': data_qiwi}})
+                    'wallets': {ETH: data_eth,
+                                RUB_QIWI: data_qiwi}})
 
 
 @a.route('/get_rates', methods=['GET'], endpoint='get_rates')
 def get_rates():
-    eth_qw = get_rate('ETH', 'RUB (QIWI)')
+    eth_qw = get_rate(ETH, RUB_QIWI)
     return jsonify({'qw_eth': 1 / eth_qw,
             'eth_qw': eth_qw})
 
