@@ -67,8 +67,8 @@ def create_accounts():
 @a.route('/get_rates', methods=['GET'], endpoint='get_rates')
 def get_rates():
     eth_qw = get_rate('ETH', 'RUB (QIWI)')
-    return {'qw_eth': 1 / eth_qw,
-            'eth_qw': eth_qw}
+    return jsonify({'qw_eth': 1 / eth_qw,
+            'eth_qw': eth_qw})
 
 
 
