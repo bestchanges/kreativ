@@ -81,9 +81,7 @@ def get_median_rate(url, currency):
     return s
 
 
-
 def get_rate(from_, to):
-
 
     global our_rate
 
