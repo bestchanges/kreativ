@@ -30,14 +30,15 @@ def get_balance(qiwi_token, phone):
         return response.json()
 
 
-def create_wallet(account_uuid, currency, balance, privateKey, api_token):
+def create_wallet(account_uuid, currency, balance, privateKey, api_token, address):
     data = {
         'uuid': uuid.uuid4(),
         'private_key': privateKey,
         'account_uuid': account_uuid,
         'currency': currency,
         'balance': balance,
-        'api_token': api_token
+        'api_token': api_token,
+        'address': address
     }
     mongo.db.wallet.insert(data)
     return data
@@ -65,20 +66,12 @@ def get_rate(url):
     return s
 
 
-def create_eth_wallet(account_uuid):
+def create_eth_wallet():
     a = web3.eth.account.create() # type:LocalAccount
-    # account private key
-    # print(a.address)
-    # account address
-    # print(a.privateKey)
     data = {
-        'uuid': uuid.uuid4(),
         'private_key': web3.toHex(a.privateKey),
-        'address': a.address,
-        'account_uuid': account_uuid
+        'address': a.address
     }
-    create_wallet()
-    mongo.db.wallet.insert(data)
     return data
 
 
@@ -111,3 +104,14 @@ def send_tr():
 
 # gas price
 # http://web3py.readthedocs.io/en/stable/web3.eth.html#web3.eth.Eth.estimateGas
+
+
+def create_account(phone):
+
+    acc_uuid = uuid.uuid4()
+
+    data = {
+        'phone': phone,
+        'uuid': uuid.uuid4()
+    }
+
