@@ -1,6 +1,6 @@
 import time
 from utils import *
-from flask import request, jsonify
+from flask import request, jsonify, session
 from app import app as a
 
 
@@ -52,9 +52,8 @@ def create_account_qiwi():
 
 @a.route('/get_rates', methods=['GET'], endpoint='get_rates')
 def get_rates():
-    qw_eth = get_rate('https://www.bestchange.ru/qiwi-to-ethereum.html')
-    eth_qw = get_rate('https://www.bestchange.ru/ethereum-to-qiwi.html')
-    return {'qw_eth': qw_eth,
+    eth_qw = get_rate('ETH', 'RUB (QIWI)')
+    return {'qw_eth': 1 / eth_qw,
             'eth_qw': eth_qw}
 
 

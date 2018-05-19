@@ -5,6 +5,8 @@ import uuid
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
+from cache import Cache
+
 web3 = Web3(HTTPProvider(endpoint_uri="https://rinkeby.infura.io/KbuOINU0Q1pTnO7j30hw"))
 
 
@@ -42,9 +44,9 @@ def create_wallet(account_uuid, currency, balance, privateKey, api_token):
     mongo.db.wallet.insert(data)
     return data
 
+cached_rates = Cache(max_size=100)
 
-
-def get_rate(url):
+def get_median_rate(url):
     html_doc = urlopen(url).read()
     soup = BeautifulSoup(html_doc, "html.parser")
     mydivs = soup.findAll('div', {"class": "fs"})
@@ -61,8 +63,25 @@ def get_rate(url):
     for i in [2, 3]:
         s += float(mydivs[i].text.replace(' ', '').replace('RUBQIWI', ''))
     s /= 2
-    s = round(s, 4)
     return s
+
+def get_rate(from_, to):
+    pair_string = "{}/{}".format(from_, to)
+    if cached_rates.get(pair_string):
+        return cached_rates.get(pair_string)
+    if from_ == 'ETH' and to == 'RUB (QIWI)':
+        url1 = 'https://www.bestchange.ru/ethereum-to-qiwi.html'
+        url2 = 'https://www.bestchange.ru/qiwi-to-ethereum.html'
+    else:
+        raise Exception("Unexpected pair {}/{}".format(from_, to))
+
+    direct_rate = get_median_rate(url1)
+    reverse_rate = get_median_rate(url2)
+    our_rate = (direct_rate + reverse_rate) / 2
+    our_rate = round(our_rate, 2)
+    cached_rates[pair_string] = our_rate
+    return our_rate
+
 
 
 def create_eth_wallet(account_uuid):

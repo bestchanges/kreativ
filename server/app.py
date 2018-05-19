@@ -19,3 +19,4 @@ def hello_world():
     return jsonify({'result': "OK"})
 
 import view
+import tr
