@@ -15,3 +15,4 @@ def hello_world():
     return jsonify({'result': "OK"})
 
 import eth
+import qiwi
