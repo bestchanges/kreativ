@@ -18,3 +18,4 @@ def hello_world():
 
 import eth
 import qiwi
+import getETHRate
