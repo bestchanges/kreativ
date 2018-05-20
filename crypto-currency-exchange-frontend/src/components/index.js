@@ -9,7 +9,7 @@ export const Head = styled.div`
 	font-weight: 500;
 	text-align: center;
 	color: #ffffff;
-	font-family: Futura;
+	font-family: Helvetica;
 `
 
 export const Center = styled.div`
@@ -32,7 +32,7 @@ export const ButtonGreen = styled.button`
   cursor: pointer;
   outline: none;
   border: none;
-  font-family: Futura;
+  font-family: Helvetica;
 `
 
 export const Flex = styled.div`

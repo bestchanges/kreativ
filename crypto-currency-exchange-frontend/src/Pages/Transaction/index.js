@@ -14,12 +14,12 @@ const Information = Flex.extend`
 
 const LinkToEtherscan = styled.a`
   font-size: 30px;
-  font-family: Futura;
+  font-family: Helvetica;
 `
 
 const Text = styled.span`
   font-size: 30px;
-  font-family: Futura;
+  font-family: Helvetica;
 `
 
 const Refresh = styled.div`

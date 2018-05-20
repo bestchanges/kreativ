@@ -2,6 +2,7 @@ import React from 'react'
 import { Icon } from 'antd'
 import styled from 'styled-components'
 import mansvg from './man.svg'
+import { insert, pipe } from 'ramda'
 
 import { getAccounts, getAuth } from '../../utils/api'
 import { Head, Center } from '../../components'
@@ -83,6 +84,14 @@ const CurrAcc = styled.div`
   color: #2a2a2a;
 `
 
+const formatQiwi = pipe(
+  insert(9, '-'),
+  insert(7, '-'),
+  insert(4, ')'),
+  insert(1, '('),
+  insert(0, '+')
+)
+
 const Account = ({ name, ethereum_address, qiwi_address, uuid, takeAccount }) =>
   <AccountWrapper onClick={() => takeAccount(uuid)} >
     <Ava>
@@ -91,7 +100,7 @@ const Account = ({ name, ethereum_address, qiwi_address, uuid, takeAccount }) =>
     <Info>
       <Name>{name}</Name>
       <Curr>QIWI</Curr>
-      <CurrAcc>{qiwi_address}</CurrAcc>
+      <CurrAcc>{formatQiwi(qiwi_address)}</CurrAcc>
       {ethereum_address && <Curr>ETH</Curr>}
       {ethereum_address && <CurrAcc>{ethereum_address}</CurrAcc>}
     </Info>

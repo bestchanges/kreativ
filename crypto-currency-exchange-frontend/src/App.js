@@ -1,9 +1,11 @@
 import React from 'react'
-import { Router, Route } from 'react-router-dom'
+import { Router, Route, Link } from 'react-router-dom'
 import createBrowserHistory from 'history/createBrowserHistory'
 import { observer } from 'mobx-react'
 import { Layout, Row } from 'antd'
 import styled from 'styled-components'
+
+import { MegaFon } from './attach/MegaFon'
 
 import {
   SellerBuyer,
@@ -56,11 +58,19 @@ const history = createBrowserHistory()
 //   : null
 
 const FooterWrapper = styled.div`
-  font-family: Futura;
+  font-family: Helvetica;
   font-size: 16px;
   font-weight: 500;
   text-align: center;
   color: #ffffff;
+`
+
+const LogoutS = styled.div`
+  position: absolute;
+  right: 64px;
+  top: 32px;
+  color: #fff !important;
+  z-index: 999;
 `
 
 const App = () =>
@@ -75,6 +85,8 @@ const App = () =>
             <Route component={BackButton} />
           </Col>
         </Row> */}
+        <LogoutS><Link to='/'>Logout</Link></LogoutS>
+        <MegaFon />
         <Row>
           {routes.map(({ component: Container, ...route }, i) =>
             <Route

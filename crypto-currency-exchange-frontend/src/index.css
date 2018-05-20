@@ -1,8 +1,9 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Futura', 'Open Sans', 'Segoe UI', 'HelveticaNeue-Light', sans-serif;
+  font-family: 'Helvetica', 'Open Sans', 'Segoe UI', 'HelveticaNeue-Light', sans-serif;
   font-weight: 300;
+  background-color: #5f19aa !important;
 }
 
 #root {

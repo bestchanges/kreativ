@@ -11,7 +11,7 @@ const Pair = styled.div`
   display: flex;
   flex-direction: row;
   margin-top: 66px;
-  font-family: Futura;
+  font-family: Helvetica;
 `
 
 const Card = styled.div`
@@ -73,7 +73,7 @@ const Available = styled.div`
 `
 
 const Rubl = styled.div`
-  font-family: Futura;
+  font-family: Helvetica;
   font-size: 64px;
   font-weight: 300;
   color: #2a2a2a;

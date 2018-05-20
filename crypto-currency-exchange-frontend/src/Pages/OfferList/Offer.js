@@ -14,7 +14,7 @@ const OfferWrapper = styled.div`
 `
 
 const Title = styled.div`
-  font-family: Futura;
+  font-family: Helvetica;
   font-size: 10px;
   font-weight: 500;
   color: #838383;

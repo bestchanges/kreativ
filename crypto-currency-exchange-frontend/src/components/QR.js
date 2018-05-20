@@ -3,9 +3,10 @@ import styled from 'styled-components'
 import qr from 'qr-image'
 
 const Wrapper = styled.div`
-  width: 12rem;
-  height: 12rem;
+  width: 196px;
+  height: 196px;
   position: relative;
+  margin-top: 40px;
 `
 
 class QR extends Component {

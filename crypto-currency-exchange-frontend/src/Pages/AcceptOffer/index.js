@@ -76,7 +76,7 @@ const BuyButton = ButtonGreen.extend`
 const Input = styled.input`
   border: none;
   outline: none;
-  font-family: Futura;
+  font-family: Helvetica;
   width: 190px;
 	font-size: 30px;
 	font-weight: 500;
@@ -89,7 +89,7 @@ const Input = styled.input`
 const InputRight = styled.input`
   border: none;
   outline: none;
-  font-family: Futura;
+  font-family: Helvetica;
   width: 250px;
   font-size: 18px;
   font-weight: 500;
@@ -114,7 +114,7 @@ const RubC = styled.div`
 `
 
 const QiwiTitle = styled.div`
-  font-family: Futura;
+  font-family: Helvetica;
   font-size: 30px;
   font-weight: 500;
   color: #2a2a2a;
