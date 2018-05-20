@@ -1,9 +1,17 @@
 import { currencies } from '../settings'
+import { find, values, propEq } from 'ramda'
 
 export const formatMoney = (amount, currency, type) => {
-  if (!type) {
-    return (amount / 100).toString()
+  if (currency) {
+    const { short, sign, name, decimals } = find(
+      propEq('short', currency),
+      values(currencies)
+    )
+
+    return `${sign}${(amount / Math.pow(10, decimals)).toFixed(decimals)}`
   }
+
+  return (amount / 100).toString()
 
   return 'Error :)'
 }

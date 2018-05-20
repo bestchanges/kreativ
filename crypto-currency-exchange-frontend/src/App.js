@@ -1,9 +1,18 @@
 import React from 'react'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
-import { Layout, Col } from 'antd'
+import { Router, Route, Link } from 'react-router-dom'
+import createBrowserHistory from 'history/createBrowserHistory'
+import { observer } from 'mobx-react'
+import { Layout, Col, Button, Icon, Row } from 'antd'
 import styled from 'styled-components'
 
-import { SellerBuyer } from './Pages'
+import {
+  SellerBuyer,
+  Wallet,
+  Sell,
+  Accounts,
+  CreateOffer,
+} from './Pages'
+import { Store } from './Store'
 
 const Logo = styled.span`
   font-size: 2rem;
@@ -11,23 +20,64 @@ const Logo = styled.span`
   color: #fff;
 `
 
-const WhiteSpace = styled.div`
-  padding: 1rem 0;
-`
+const routes = [
+  {
+    path: '/sellbuy',
+    component: observer(SellerBuyer),
+  }, {
+    path: '/wallet',
+    component: observer(Wallet),
+  }, {
+    path: '/sell',
+    component: observer(Sell)
+  }, {
+    exact: true,
+    path: '/',
+    component: observer(Accounts)
+  }, {
+    path: '/create_offer',
+    component: observer(CreateOffer)
+  }
+]
+
+const store = new Store()
+const history = createBrowserHistory()
+
+const BackButton = ({ history }) => history.location.pathname !== '/'
+  ? <Button onClick={history.goBack}>
+      <Icon type='left' />Back
+    </Button>
+  : null
 
 const App = () =>
-  <Router>
-    <div className='app'>
+  <Router history={history}>
+    <Layout className='app'>
       <Layout.Header>
-        <Logo>Creative</Logo>
+        <Link to='/'><Logo>Creative</Logo></Link>
       </Layout.Header>
-      <WhiteSpace />
-      <Col offset={1} span={22}>
-        <Layout>
-          <Route path='/' component={SellerBuyer} />
-        </Layout>
-      </Col>
-    </div>
+      <Layout style={{ paddingTop: '2rem' }}>
+        <Row>
+          <Col offset={2} span={20}>
+            <Route component={BackButton} />
+          </Col>
+        </Row>
+        <Row>
+          {routes.map(({ component: Container, ...route }) =>
+            <Route
+              key={route.path}
+              render={
+                (other) => <Container
+                  store={store}
+                  {...other}
+                />
+              }
+              {...route}
+            />
+          )}
+        </Row>
+      </Layout>
+      <Layout.Footer>© 2018 Actum Digital Hackaton “Creative” team</Layout.Footer>
+    </Layout>
   </Router>
 
 export default App

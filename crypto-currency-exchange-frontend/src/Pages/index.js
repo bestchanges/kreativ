@@ -1,1 +1,5 @@
-export { SellerBuyer } from './SellerBuyer/index'
+export { SellerBuyer } from './SellerBuyer'
+export { Wallet } from './Wallet'
+export { Sell } from './Sell'
+export { Accounts } from './Accounts'
+export { CreateOffer } from './CreateOffer'

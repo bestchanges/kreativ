@@ -1,14 +1,17 @@
 import React, { Component } from 'react'
-import { evolve, add } from 'ramda'
-import { Input, Button, Col, Row, Form } from 'antd'
+import styled from 'styled-components'
+import { Button, Col, Row, Layout } from 'antd'
+import { Link } from 'react-router-dom'
 
 import { localize } from '../../settings'
-import { plusMinus, formatMoney } from '../../utils'
+import { fetchRates } from '../../utils/api'
+
+import { Title } from '../../components'
 
 import { CurrencyInfo } from './CurrencyInfo'
-import { TestEndpoint } from './TestEndpoint'
 
-const fetchTimeout = 3000
+
+const fetchTimeout = 30000
 
 class SellerBuyer extends Component {
   static defaultProps = {
@@ -17,16 +20,14 @@ class SellerBuyer extends Component {
   }
 
   state = {
-    exchangeRate: this.props.exchangeRate,
-    totalAmount: this.props.totalAmount,
+    totalETH: 0,
+    totalRUB: 0,
   }
 
   componentDidMount() {
+    this.fetchRate()
     this.fetch = setInterval(() => {
-      this.setState(evolve({
-        exchangeRate: add(plusMinus(100)),
-        totalAmount: add(plusMinus(400)),
-      }))
+      this.fetchRate()
     }, fetchTimeout)
   }
 
@@ -34,32 +35,47 @@ class SellerBuyer extends Component {
     clearInterval(this.fetch)
   }
 
+  fetchRate = () => {
+    fetchRates().then(({ eth_qw } = {}) => {
+      this.setState({
+        rateSell: eth_qw,
+        rateBuy: eth_qw,
+      })
+    })
+  }
+
   render() {
-    const { exchangeRate, totalAmount } = this.state
+    const { rateSell, rateBuy, totalETH, totalRUB } = this.state
 
     return (
-      <div>
-        <Row style={{ paddingTop: '2rem' }}>
-          <Col span={9} offset={2}>
+      <Row style={{ padding: '2rem 0' }}>
+        <Col span={10} offset={2} style={{ paddingRight: '1rem' }}>
+          <Layout.Content style={{ textAlign: 'right' }}>
+            <Title>{localize.SellerBuyer.sellTitle}</Title>
             <CurrencyInfo
-              exchangeRate={exchangeRate}
-              totalAmount={totalAmount}
+              exchangeRate={rateSell}
+              totalAmount={totalRUB}
+              sell
+              right
+              totalAmountCurrency='RUB'
             />
-          </Col>
-          <Col span={9} offset={2}>
+            <Link to={'/create_offer'}>
+              <Button size='large' type='primary'>{localize.SellerBuyer.sell}</Button>
+            </Link>
+          </Layout.Content>
+        </Col>
+        <Col span={10} offset={0} style={{ paddingLeft: '1rem' }}>
+          <Layout.Content>
+            <Title>{localize.SellerBuyer.buyTitle}</Title>
             <CurrencyInfo
-              exchangeRate={exchangeRate}
-              totalAmount={totalAmount}
+              exchangeRate={rateBuy}
+              totalAmount={totalETH}
+              totalAmountCurrency='ETH'
             />
-          </Col>
-        </Row>
-
-        <Row style={{ marginTop: '4rem' }}>
-          <Col span={20} offset={2}>
-            <TestEndpoint />
-          </Col>
-        </Row>
-      </div>
+            <Button size='large' type='primary'>{localize.SellerBuyer.buy}</Button>
+          </Layout.Content>
+        </Col>
+      </Row>
     )
   }
 }
