@@ -17,12 +17,15 @@ def list_accounts():
     result = mongo.db.account.find()
     accounts = []
     for account in result:
+        del account["_id"]
         account['wallets'] = {ETH:[], RUB_QIWI:[]}
         for wallet in mongo.db.wallet.find({ 'currency': ETH, 'account_uuid': account['uuid']}):
+            del wallet['_id']
             wallet['private_key'] = ''
             wallet['api_token'] = ''
             account['wallets'][ETH].append(wallet)
         for wallet in mongo.db.wallet.find({ 'currency': RUB_QIWI, 'account_uuid': account['uuid']}):
+            del wallet['_id']
             wallet['private_key'] = ''
             wallet['api_token'] = ''
             account['wallets'][RUB_QIWI].append(wallet)

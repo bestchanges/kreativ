@@ -20,6 +20,12 @@ json_encoder = json.JSONEncoder(indent=4, default=default_encode)
 
 @a.route('/list_accounts', methods=['POST', 'GET'])
 def list_accounts1():
+    return jsonify(list_accounts())
+
+
+@a.route('/auth', methods=['POST', 'GET'])
+def auth_account():
+
     return json_encoder.encode(list_accounts())
 
 
