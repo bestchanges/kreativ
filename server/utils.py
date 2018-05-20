@@ -13,23 +13,30 @@ ETH = 'ETH'
 
 #mongo = MongoClient()
 
+def get_account(account_uuid):
+    account = mongo.db.account.find_one({'uuid': account_uuid})
+    if not account:
+        raise Exception("Not found account {}".format(account_uuid))
+    del account["_id"]
+    account['wallets'] = {ETH: [], RUB_QIWI: []}
+    for wallet in mongo.db.wallet.find({'currency': ETH, 'account_uuid': account['uuid']}):
+        del wallet['_id']
+        wallet['private_key'] = ''
+        wallet['api_token'] = ''
+        account['wallets'][ETH].append(wallet)
+    for wallet in mongo.db.wallet.find({'currency': RUB_QIWI, 'account_uuid': account['uuid']}):
+        del wallet['_id']
+        wallet['private_key'] = ''
+        wallet['api_token'] = ''
+        account['wallets'][RUB_QIWI].append(wallet)
+    return account
+
+
 def list_accounts():
     result = mongo.db.account.find()
     accounts = []
     for account in result:
-        del account["_id"]
-        account['wallets'] = {ETH:[], RUB_QIWI:[]}
-        for wallet in mongo.db.wallet.find({ 'currency': ETH, 'account_uuid': account['uuid']}):
-            del wallet['_id']
-            wallet['private_key'] = ''
-            wallet['api_token'] = ''
-            account['wallets'][ETH].append(wallet)
-        for wallet in mongo.db.wallet.find({ 'currency': RUB_QIWI, 'account_uuid': account['uuid']}):
-            del wallet['_id']
-            wallet['private_key'] = ''
-            wallet['api_token'] = ''
-            account['wallets'][RUB_QIWI].append(wallet)
-        accounts.append(account)
+        accounts.append(get_account(account['uuid']))
     return accounts
 
 # @a.route('/getbalanceqiwi', methods=['POST'], endpoint='get_balance')
@@ -55,7 +62,7 @@ def get_balance(qiwi_token, phone):
 
 def create_wallet(account_uuid, currency, balance, privateKey, api_token, address):
     data = {
-        'uuid': uuid.uuid4(),
+        'uuid': str(uuid.uuid4()),
         'private_key': privateKey,
         'account_uuid': account_uuid,
         'currency': currency,
@@ -172,7 +179,7 @@ def send_tr():
 # http://web3py.readthedocs.io/en/stable/web3.eth.html#web3.eth.Eth.estimateGas
 
 def create_account(name, qiwi_address, ethereum_address = None, qiwi_token = None, ethereum_private_key = None):
-    acc_uuid = uuid.uuid4()
+    acc_uuid = str(uuid.uuid4())
 
     data = {
         'ethereum_address': ethereum_address,

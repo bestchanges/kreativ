@@ -5,7 +5,7 @@ from uuid import UUID
 from bson import ObjectId
 
 from utils import *
-from flask import request, jsonify
+from flask import request, jsonify, session
 from app import app as a
 
 
@@ -20,13 +20,15 @@ json_encoder = json.JSONEncoder(indent=4, default=default_encode)
 
 @a.route('/list_accounts', methods=['POST', 'GET'])
 def list_accounts1():
-    return jsonify(list_accounts())
+    return json_encoder.encode(list_accounts())
 
 
 @a.route('/auth', methods=['POST', 'GET'])
 def auth_account():
-
-    return json_encoder.encode(list_accounts())
+    account_uuid = request.args.get('account_uuid')
+    account = get_account(account_uuid)
+    session['account_uuid'] = account_uuid
+    return json_encoder.encode(account)
 
 
 @a.route('/sendmoneyqiwi', methods=['POST'], endpoint='send_money_qiwi')
