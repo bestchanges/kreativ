@@ -17,9 +17,17 @@ def list_accounts():
     result = mongo.db.account.find()
     accounts = []
     for account in result:
-        accounts.add(account)
+        account['wallets'] = {ETH:[], RUB_QIWI:[]}
+        for wallet in mongo.db.wallet.find({ 'currency': ETH, 'account_uuid': account['uuid']}):
+            wallet['private_key'] = ''
+            wallet['api_token'] = ''
+            account['wallets'][ETH].append(wallet)
+        for wallet in mongo.db.wallet.find({ 'currency': RUB_QIWI, 'account_uuid': account['uuid']}):
+            wallet['private_key'] = ''
+            wallet['api_token'] = ''
+            account['wallets'][RUB_QIWI].append(wallet)
+        accounts.append(account)
     return accounts
-
 
 # @a.route('/getbalanceqiwi', methods=['POST'], endpoint='get_balance')
 def get_balance(qiwi_token, phone):

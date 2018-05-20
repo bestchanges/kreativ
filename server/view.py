@@ -1,12 +1,27 @@
+import json
 import time
+from uuid import UUID
+
+from bson import ObjectId
+
 from utils import *
 from flask import request, jsonify
 from app import app as a
 
+
+def default_encode(o):
+    if isinstance(o, ObjectId):
+        return str(o)
+    if isinstance(o, UUID):
+        return str(o)
+
+
+json_encoder = json.JSONEncoder(indent=4, default=default_encode)
+
 @a.route('/list_accounts', methods=['POST', 'GET'])
-def list_accounts():
-    accounts = mongo.db.account.find()
-    return jsonify(accounts)
+def list_accounts1():
+    return json_encoder.encode(list_accounts())
+
 
 @a.route('/sendmoneyqiwi', methods=['POST'], endpoint='send_money_qiwi')
 def send_money_qiwi():
