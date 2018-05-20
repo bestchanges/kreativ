@@ -1,3 +1,6 @@
 {
-  "/createaccountqiwi": "/createaccountqiwi"
+  "/fetch_rates": "/fetch_rates",
+  "/createaccountqiwi": "/createaccountqiwi",
+  "/get_wallet": "/get_wallet",
+  "/accounts": "/accounts"
 }

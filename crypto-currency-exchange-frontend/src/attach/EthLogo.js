@@ -8,7 +8,7 @@ const LogoWrapper = styled.div`
   display: inline-block;
 `
 
-export const EthLogo = () =>
-  <LogoWrapper>
+export const EthLogo = (props) =>
+  <LogoWrapper {...props}>
     <img src={ethLogo} alt='eth logo' width='100%' height='100%' />
   </LogoWrapper>

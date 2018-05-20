@@ -1,3 +1,36 @@
 {
-  "createaccountqiwi": {}
+  "createaccountqiwi": {
+    "token": "",
+    "phone": "",
+    "wallet": ""
+  },
+  "fetch_rates": {
+    "rate": {
+      "sell": "4100000",
+      "buy": "4200000"
+    },
+    "amount": {
+      "ETH": "8900000",
+      "RUB": "140000000"
+    }
+  },
+  "get_wallet": {
+    "account": "0x98ee18d7a1f7510b78b36f5a16471c7cd0c1c531"
+  },
+  "accounts": [
+    {
+      "account_uuid": "oijsdo",
+      "wallets": {
+        "ETH": [{
+          "uuid": "123",
+          "private_key": "privateKey",
+          "account_uuid": "account_uuid",
+          "currency": "currency",
+          "balance": "balance",
+          "api_token": "api_token",
+          "address": "address"
+        }]
+      }
+    }
+  ]
 }
