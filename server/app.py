@@ -9,4 +9,3 @@ CORS(app)
 mongo = PyMongo(app)
 
 import view
-import tr

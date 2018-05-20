@@ -1,5 +1,4 @@
 import requests
-from flask_pymongo import MongoClient
 from web3 import Web3, HTTPProvider
 from app import mongo
 import uuid
@@ -10,8 +9,6 @@ web3 = Web3(HTTPProvider(endpoint_uri="https://rinkeby.infura.io/KbuOINU0Q1pTnO7
 
 RUB_QIWI = 'RUB (QIWI)'
 ETH = 'ETH'
-
-#mongo = MongoClient()
 
 def get_account(account_uuid):
     account = mongo.db.account.find_one({'uuid': account_uuid})
@@ -176,26 +173,6 @@ def get_eth_balance(address):
     balance = balance / 10**18
     return balance
 
-
-def send_tr():
-    # send transaction
-    # http://web3py.readthedocs.io/en/stable/web3.eth.html#web3.eth.Eth.sendTransaction
-    private_key = 0x0  # ................
-    from_account = web3.eth.account.privateKeyToAccount(private_key)  # type:LocalAccount
-    print(from_account.address)
-    tx_data = dict(
-        nonce=web3.eth.getTransactionCount(from_account.address),
-        gasPrice=web3.eth.gasPrice,
-        gas=21000,
-        to="0xec3B133a9A3097f6513f27eaD93B849453eb7C74",
-        value=12346,
-        data=b'',
-    )
-    print(tx_data)
-    tx = from_account.signTransaction(tx_data)
-    # http://web3py.readthedocs.io/en/stable/web3.eth.html#web3.eth.Eth.sendRawTransaction
-    tx_id = web3.eth.sendRawTransaction(tx['rawTransaction'])
-    print(web3.toHex(tx_id))
 
 
 # gas price
