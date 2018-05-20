@@ -62,7 +62,8 @@ def create_offer():
 
     mongo.db.offers.insert(data)
     offer = mongo.db.offers.find_one({'uuid': offer_uuid})
-    return json_encoder.encode(offer)
+    wallet = mongo.db.wallet.find_one({'uuid': offer['seller_from_wallet_uuid']})
+    return json_encoder.encode({'offer': offer, 'wallet': wallet})
 
 
 @a.route('/list_accounts', methods=['POST', 'GET'])
