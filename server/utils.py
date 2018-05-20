@@ -141,7 +141,7 @@ def get_rate(from_, to):
 
     direct_rate = get_median_rate(url1, from_)
     reverse_rate = get_median_rate(url2, to)
-    our_rate = (direct_rate + reverse_rate) / 2
+    our_rate = round((direct_rate + reverse_rate) / 2, 2)
     return int(our_rate * 100)
 
 
@@ -251,6 +251,8 @@ def send_money_qiwi(token, phone, amount):
 
     if response.status_code != 200:
         raise Exception("Not send")
+    else:
+        return id
 
 
 
