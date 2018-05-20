@@ -54,7 +54,7 @@ def start_transaction(buyer_account_uuid, offer_uuid, buyer_from_wallet_uuid, bu
     # check balance for seller_from_wallet (must have + fee amount)
 
     # check balance for buyer_from_wallet
-    buyer_from_wallet_balance = get_qiwi_balance_for_wallet(buyer_from_wallet)
+    buyer_from_wallet_balance = update_qiwi_balance_for_wallet(buyer_from_wallet)
     if buyer_from_wallet_balance < payed_amount:
         raise Exception("Not enought balance on wallet {}. required: {}, available: {}".format(buyer_from_wallet['uuid'], buyer_from_wallet_balance, payed_amount))
 

@@ -40,9 +40,21 @@ def list_accounts():
     return accounts
 
 
+def update_balance_for_wallet(wallet):
+    if wallet['currency'] == ETH:
+        return update_eth_balance_for_wallet(wallet)
+    elif wallet['currency'] == RUB_QIWI:
+        return update_qiwi_balance_for_wallet(wallet)
+    raise Exception("shall not be here")
 
-def get_qiwi_balance_for_wallet(wallet):
-    return get_qiwi_balance(wallet['api_token'], wallet['address'])
+
+def update_qiwi_balance_for_wallet(wallet):
+    if wallet['currency'] != RUB_QIWI:
+        raise Exception("Not QIWI")
+    balance = get_qiwi_balance(wallet['api_token'], wallet['address'])
+    wallet['balance'] = balance
+    mongo.db.wallet.find_one_and_replace({'uuid': wallet['uuid']}, wallet)
+    return wallet
 
 
 def get_qiwi_balance(qiwi_token, phone):
@@ -148,16 +160,21 @@ def create_eth_wallet():
     return data
 
 
-def check_account_balance(address):
+def update_eth_balance_for_wallet(wallet):
+    if wallet['currency'] != ETH:
+        raise Exception("Not ETH")
+    balance = get_eth_balance(wallet['address'])
+    wallet['balance'] = balance
+    mongo.db.wallet.find_one_and_replace({'uuid': wallet['uuid']}, wallet)
+    return wallet
+
+
+def get_eth_balance(address):
     # check account balance
     balance = web3.eth.getBalance(address)
     # balance = web3.eth.getBalance(a.address)
     balance = balance / 10**18
     return balance
-
-
-def get_eth_balance(adress):
-    return check_account_balance(adress)
 
 
 def send_tr():

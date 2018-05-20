@@ -136,12 +136,8 @@ def sample_accounts():
 def wallet_balance():
     wallet_uuid = request.args.get('wallet_uuid')
     wallet = mongo.db.wallet.find_one({'uuid': wallet_uuid})
-    balance = None
-    if wallet['currency'] == ETH:
-        balance = get_eth_balance(wallet['address'])
-    elif wallet['currency'] == RUB_QIWI:
-        balance = get_qiwi_balance_for_wallet(wallet)
-    return jsonify(balance)
+    wallet = update_balance_for_wallet(wallet)
+    return jsonify(wallet['balance'])
 
 
 
