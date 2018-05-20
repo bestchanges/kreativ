@@ -65,6 +65,12 @@ def get_rates():
             'eth_qw': eth_qw})
 
 
+@a.route('/sample_accounts', methods=['GET'])
+def sample_accounts():
+    r = create_sample_accounts()
+    return jsonify(r)
+
+
 
 @a.route('/get_wallet', methods=['POST'])
 def get_address():

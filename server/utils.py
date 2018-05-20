@@ -38,9 +38,8 @@ def get_balance(qiwi_token, phone):
         data = response.json()
         for c in data['accounts']:
             return c['balance']['amount']
-    else:
-        # response['message']
-        raise Exception("Error getting balance")
+    print(response.json())
+    raise Exception("Error getting balance")
 
 
 def create_wallet(account_uuid, currency, balance, privateKey, api_token, address):
@@ -93,7 +92,7 @@ def get_median_rate(url, currency):
     return s
 
 
-our_rate = None
+our_rate = 4200045
 
 def get_rate(from_, to):
 
@@ -173,19 +172,23 @@ def create_account(name, qiwi_address, ethereum_address = None, qiwi_token = Non
 
     mongo.db.account.insert(data)
 
-    balance = get_balance(qiwi_token, qiwi_address)
-    if not isinstance(balance, float):
-        return balance
+    if qiwi_token:
+        balance = get_balance(qiwi_token, qiwi_address)
+    else:
+        balance = 0
 
     data_qiwi = create_wallet(acc_uuid, RUB_QIWI, balance, '', qiwi_token, qiwi_address)
 
-    data_eth = create_eth_wallet()
-    eth_close_address = data_eth['private_key']
+    if not ethereum_address:
+        data_eth = create_eth_wallet()
+        ethereum_private_key = data_eth['private_key']
+        ethereum_address = data_eth['address']
+        balance = 0 # for sure. We just created it
+    else:
+        balance = get_eth_balance(ethereum_address)
     # ДОПИЛИТЬ - ПРЛУЧИТЬ БАЛАНС КРИПТЫ
     # balance = get_eth_balance(eth_close_address)
-    data_eth = create_wallet(acc_uuid, ETH, balance, eth_close_address, '', ethereum_address)
-
-
+    data_eth = create_wallet(acc_uuid, ETH, balance, ethereum_private_key, '', ethereum_address)
     return acc_uuid
 
 
@@ -194,9 +197,13 @@ def create_sample_accounts():
     # alice buy ETH
     create_account(
         "ALICE",
-        qiwi_address="",
-        qiwi_token="cfa7547d48913cee745395c2a7f0de4d",
+        qiwi_address="79636853224",
+        qiwi_token="7820a390d136f825461739c26ae7324b",
         ethereum_address="0x6afCFCEc1e595cd4D43e4c1D69e4590DC1944B29",
     )
-    create_account("BOB", )
+    create_account(
+        "BOB",
+        qiwi_address="79118341146",
+        qiwi_token="",
+    )
 
