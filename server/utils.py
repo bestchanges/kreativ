@@ -40,7 +40,7 @@ def list_accounts():
     return accounts
 
 # @a.route('/getbalanceqiwi', methods=['POST'], endpoint='get_balance')
-def get_balance(qiwi_token, phone):
+def get_qiwi_balance(qiwi_token, phone):
     # json_data = request.get_json()
     # qiwi_token = json_data.get('token', '')
     # phone = json_data.get('phone', '')
@@ -147,7 +147,8 @@ def check_account_balance(address):
     # check account balance
     balance = web3.eth.getBalance(address)
     # balance = web3.eth.getBalance(a.address)
-    print(balance)
+    balance = balance / 10**18
+    return balance
 
 
 def get_eth_balance(adress):
@@ -190,8 +191,9 @@ def create_account(name, qiwi_address, ethereum_address = None, qiwi_token = Non
 
     mongo.db.account.insert(data)
 
+    # TODO: do not request balance here. Do it somethere later by separate request wallet_balance
     if qiwi_token:
-        balance = get_balance(qiwi_token, qiwi_address)
+        balance = get_qiwi_balance(qiwi_token, qiwi_address)
     else:
         balance = 0
 
