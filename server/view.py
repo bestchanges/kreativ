@@ -74,39 +74,6 @@ def auth_account():
     return json_encoder.encode(account)
 
 
-@a.route('/sendmoneyqiwi', methods=['POST'], endpoint='send_money_qiwi')
-def send_money_qiwi():
-    json_data = request.get_json()
-    token = json_data.get('token', '')
-    phone = json_data.get('phone', '')
-    amount = json_data.get('amount', '')
-    api_url = 'https://edge.qiwi.com/sinap/api/v2/terms/99/payments'
-
-    headers = {'Content-Type': 'application/json',
-               'Accept': 'application/json',
-               'Authorization': 'Bearer ' + token}
-
-    id = round(time.time() * 100000)
-    data = {'id': str(id),
-            'sum': {
-                'amount': amount,
-                'currency': '643'},
-            'paymentMethod': {
-                'type': 'Account',
-                'accountId': '643'},
-            'comment': 'test',
-            'fields': {
-                'account': phone}}
-
-    response = requests.post(api_url, headers=headers, json=data)
-
-    if response.status_code == 200:
-        return jsonify({'code': 200,
-                        'message': id})
-    else:
-        return response.text
-
-
 @a.route('/createaccount', methods=['POST'], endpoint='create_accounts')
 def create_accounts():
 
