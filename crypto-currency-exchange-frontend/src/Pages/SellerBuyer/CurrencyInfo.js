@@ -1,26 +1,30 @@
 import React from 'react'
-import { Input, Button, Col, Form } from 'antd'
+import { Input, Form } from 'antd'
+import styled from 'styled-components'
 
 import { localize } from '../../settings'
 import { formatMoney } from '../../utils'
 
-const CurrencyInfo = ({ exchangeRate, totalAmount }) =>
-  <Form>
+const SubTitle = styled.div`
+  color: #444;
+  font-size: 1rem;
+`
+
+const Amount = styled.div`
+  color: #333;
+  font-size: 3rem;
+`
+
+const CurrencyInfo = ({ exchangeRate, totalAmount, sell, totalAmountCurrency, right }) =>
+  <Form style={{ textAlign: right ? 'right' : 'left' }}>
     <Form.Item>
-      <Input
-        addonBefore={localize.SellerBuyer.exchangeRate}
-        value={formatMoney(exchangeRate)}
-        onChange={() => null}
-      />
+      <SubTitle>{sell ? localize.SellerBuyer.sellRate : localize.SellerBuyer.buyRate}</SubTitle>
+      {exchangeRate && <Amount>{formatMoney(exchangeRate, 'RUB')}</Amount>}
     </Form.Item>
     <Form.Item>
-      <Input
-        addonBefore={localize.SellerBuyer.totalAmount}
-        value={formatMoney(totalAmount)}
-        onChange={() => null}
-      />
+      <SubTitle>{localize.SellerBuyer.totalAmount}</SubTitle>
+      {exchangeRate && <Amount>{formatMoney(totalAmount, totalAmountCurrency)}</Amount>}
     </Form.Item>
-    <Button>{localize.SellerBuyer.exchangeButton}</Button>
   </Form>
 
 export {
