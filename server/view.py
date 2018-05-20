@@ -29,6 +29,7 @@ def get_offer_list():
         wallet = mongo.db.wallet.find({'uuid': result['seller_from_wallet_uuid']})
         if not wallet:
             raise Exception("Not found wallet")
+        wallet=update_balance_for_wallet(wallet)
         offers.append({'offer': result, 'wallet': wallet})
     return json_encoder.encode(offers)
 
