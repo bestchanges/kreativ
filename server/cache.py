@@ -33,7 +33,7 @@ class Cache():
             timeout = time.time() + timeout
         self._store[key] = (value, timeout)
 
-    def get(self, key, default=None):
+    def get(self, key: object, default: object = None) -> object:
         data = self._store.get(key)
         if not data:
             return default

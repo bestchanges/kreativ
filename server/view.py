@@ -18,6 +18,34 @@ def default_encode(o):
 
 json_encoder = json.JSONEncoder(indent=4, default=default_encode)
 
+
+@a.route('/create_offer', methods=['POST'], endpoint='create_offer')
+def create_offer():
+    json_data = request.get_json()
+    seller_account_uuid = json_data.get('seller_account_uuid', '')
+
+    seller_from_wallet_uuid = json_data.get('seller_from_wallet_uuid', '')
+
+
+    data = {
+        'uuid': uuid.uuid4(),
+        'seller_account_uuid': seller_account_uuid,
+        'seller_from_wallet_uuid': seller_from_wallet_uuid,
+        'seller_to_wallet_uuid': '',
+        'state': 'open',
+        'locked': False,
+        'rate': get_rate(ETH, RUB_QIWI),
+        'rate_index': '',
+        'seller_fee': '',
+        'buyer_fee': ''
+        }
+
+    mongo.db.offers.insert(data)
+
+    return jsonify({'code': 'OK',
+                    'message': 'created'})
+
+
 @a.route('/list_accounts', methods=['POST', 'GET'])
 def list_accounts1():
     return json_encoder.encode(list_accounts())
