@@ -20,14 +20,16 @@ def default_encode(o):
 
 json_encoder = json.JSONEncoder(indent=4, default=default_encode)
 
+
 @a.route('/list_offers', methods=['GET'], endpoint='get_offer_list')
 def list_offers():
     offers = []
     for result in mongo.db.offers.find({'state': 'open'}):
         wallet = mongo.db.wallet.find_one({'uuid': result['seller_from_wallet_uuid']})
         if not wallet:
-            raise Exception("Not found wallet")
-        wallet=update_balance_for_wallet(wallet)
+            continue
+            #raise Exception("Not found wallet")
+        wallet = update_balance_for_wallet(wallet)
         offers.append({'offer': result, 'wallet': wallet})
     return json_encoder.encode(offers)
 
@@ -56,7 +58,7 @@ def create_offer():
         'rate_index': 1,
         'seller_fee': 0,
         'buyer_fee': 0
-        }
+    }
 
     mongo.db.offers.insert(data)
     offer = mongo.db.offers.find_one({'uuid': offer_uuid})
@@ -78,7 +80,6 @@ def auth_account():
 
 @a.route('/createaccount', methods=['POST'], endpoint='create_accounts')
 def create_accounts():
-
     json_data = request.get_json()
     qiwi_token = json_data.get('token', '')
     qiwi_address = json_data.get('qiwi_address', '')
@@ -96,8 +97,16 @@ def create_accounts():
 @a.route('/get_rates', methods=['GET'], endpoint='get_rates')
 def get_rates():
     eth_qw = get_rate(ETH, RUB_QIWI)
+    offers = []
+    s = 0
+    for result in mongo.db.offers.find({'state': 'open'}):
+        wallet = mongo.db.wallet.find_one({'uuid': result['seller_from_wallet_uuid']})
+        if wallet:
+            s += wallet['balance']
+
     return jsonify({'qw_eth': 1 / eth_qw,
-            'eth_qw': eth_qw})
+                    'eth_qw': eth_qw,
+                    'sum_all_offers': s})
 
 
 @a.route('/sample_accounts', methods=['GET'])
@@ -129,10 +138,12 @@ def create_transaction1():
         buyer_to_wallet_uuid = data.get('to_wallet_uuid')
         amount = float(data.get('amount'))
 
-        transaction = create_transaction(buyer_account_uuid, offer_uuid, buyer_from_wallet_uuid, buyer_to_wallet_uuid, amount)
+        transaction = create_transaction(buyer_account_uuid, offer_uuid, buyer_from_wallet_uuid, buyer_to_wallet_uuid,
+                                         amount)
         return json_encoder.encode(transaction)
     except Exception as e:
         return json_encoder.encode({'error': True, 'message': str(e)})
+
 
 @a.route('/execute_transaction', methods=['GET', 'POST'])
 def execute_transaction1():
