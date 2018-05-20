@@ -7,7 +7,6 @@ from flask import request, jsonify
 from app import app as a
 
 
-@a.route('/offer', methods=['POST'])
 def create_offer():
     json_data = request.get_json()
     seller_from_wallet_uuid = json_data.get('from_wallet_uuid')

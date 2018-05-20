@@ -23,6 +23,7 @@ json_encoder = json.JSONEncoder(indent=4, default=default_encode)
 def create_offer():
     json_data = request.get_json()
     seller_account_uuid = json_data.get('seller_account_uuid', '')
+    account_uuid = session['account_uuid']
 
     seller_from_wallet_uuid = json_data.get('seller_from_wallet_uuid', '')
 
@@ -120,6 +121,16 @@ def get_rates():
 def sample_accounts():
     r = create_sample_accounts()
     return jsonify(r)
+
+
+@a.route('/wallet_balance', methods=['GET'])
+def wallet_balance():
+    wallet_uuid = request.args.get('wallet_uuid')
+    wallet = mongo.db.wallet.find_one({'uuid': wallet_uuid})
+    balance = None
+    if wallet['currency'] == ETH:
+        balance = get_eth_balance(wallet['address'])
+    return jsonify(balance)
 
 
 
