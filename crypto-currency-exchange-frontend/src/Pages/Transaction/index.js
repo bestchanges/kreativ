@@ -84,7 +84,7 @@ class Transaction extends React.Component {
 
     return (
       <Center>
-        <Information style={{ padding: '8px 20px', height: '40px' }}>
+        <Information style={{ padding: '8px 20px', height: '40px', fontSize: '16px' }}>
           {time}
         </Information>
         {tx_id && <Information>

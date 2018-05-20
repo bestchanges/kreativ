@@ -115,10 +115,11 @@ class SellerBuyer extends Component {
   }
 
   fetchRate = () => {
-    fetchRates().then(({ eth_qw } = {}) => {
+    fetchRates().then(({ eth_qw, sum_all_offers } = {}) => {
       this.setState({
         rateSell: eth_qw,
         rateBuy: eth_qw,
+        sum_all_offers,
       })
     })
   }
@@ -134,7 +135,7 @@ class SellerBuyer extends Component {
   }
 
   render() {
-    const { rateSell, rateBuy } = this.state
+    const { rateSell, rateBuy, sum_all_offers } = this.state
 
     return (
       <Center>
@@ -152,7 +153,7 @@ class SellerBuyer extends Component {
             <Info>
               <Title>Buy Ether</Title>
               {rateBuy && <Amount>{formatMoney(rateBuy, 'RUB')}</Amount>}
-              <Available>0₽</Available>
+              <Available>{Number(sum_all_offers).toFixed(6)} ETH</Available>
             </Info>
             <CustomButton>Buy</CustomButton>
             <EthLogo>
