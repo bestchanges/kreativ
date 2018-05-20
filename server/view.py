@@ -20,13 +20,15 @@ json_encoder = json.JSONEncoder(indent=4, default=default_encode)
 
 @a.route('/get_offer_list', methods=['GET'], endpoint='get_offer_list')
 def get_offer_list():
-    results = mongo.db.offers.find({'state': 'open', 'locked': False})
+    results = mongo.db.offers.find({'state': 'open'})
     if not results:
         raise Exception("Not found offers")
 
     offers = []
     for result in results:
-        wallet = mongo.db.offers.find({'uuid': result['seller_from_wallet_uuid']})
+        wallet = mongo.db.wallet.find({'uuid': result['seller_from_wallet_uuid']})
+        if not wallet:
+            raise Exception("Not found wallet")
         offers.append({'offer': result, 'wallet': wallet})
     return json_encoder.encode(offers)
 
@@ -35,15 +37,21 @@ def get_offer_list():
 def create_offer():
     json_data = request.get_json()
     seller_account_uuid = json_data.get('seller_account_uuid', '')
+    if seller_account_uuid == '':
+        raise Exception("Not found seller_account_uuid")
     seller_from_wallet_uuid = json_data.get('seller_from_wallet_uuid', '')
+    if seller_from_wallet_uuid == '':
+        raise Exception("Not found seller_from_wallet_uuid")
+    seller_to_wallet_uuid = json_data.get('seller_from_wallet_uuid', '')
+    if seller_to_wallet_uuid == '':
+        raise Exception("Not found seller_to_wallet_uuid")
 
     data = {
         'uuid': uuid.uuid4(),
         'seller_account_uuid': seller_account_uuid,
         'seller_from_wallet_uuid': seller_from_wallet_uuid,
-        'seller_to_wallet_uuid': '',
+        'seller_to_wallet_uuid': seller_to_wallet_uuid,
         'state': 'open',
-        'locked': False,
         'rate': get_rate(ETH, RUB_QIWI),
         'rate_index': '',
         'seller_fee': '',
