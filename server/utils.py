@@ -2,6 +2,7 @@ import requests
 from web3 import Web3, HTTPProvider
 from app import mongo
 import uuid
+import time
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
@@ -225,4 +226,31 @@ def create_sample_accounts():
         qiwi_address="79118341146",
         qiwi_token="",
     )
+
+
+def send_money_qiwi(token, phone, amount):
+    api_url = 'https://edge.qiwi.com/sinap/api/v2/terms/99/payments'
+
+    headers = {'Content-Type': 'application/json',
+               'Accept': 'application/json',
+               'Authorization': 'Bearer ' + token}
+
+    id = round(time.time() * 100000)
+    data = {'id': str(id),
+            'sum': {
+                'amount': amount,
+                'currency': '643'},
+            'paymentMethod': {
+                'type': 'Account',
+                'accountId': '643'},
+            'comment': 'test',
+            'fields': {
+                'account': phone}}
+
+    response = requests.post(api_url, headers=headers, json=data)
+
+    if response.status_code != 200:
+        raise Exception("Not send")
+
+
 

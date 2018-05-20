@@ -53,7 +53,7 @@ def create_offer():
         'rate': get_rate(ETH, RUB_QIWI),
         'rate_index': 1,
         'seller_fee': 0,
-        'buyer_fee': 0,
+        'buyer_fee': 0d,
         }
 
     mongo.db.offers.insert(data)
