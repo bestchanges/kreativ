@@ -39,7 +39,12 @@ def list_accounts():
         accounts.append(get_account(account['uuid']))
     return accounts
 
-# @a.route('/getbalanceqiwi', methods=['POST'], endpoint='get_balance')
+
+
+def get_qiwi_balance_for_wallet(wallet):
+    return get_qiwi_balance(wallet['api_token'], wallet['address'])
+
+
 def get_qiwi_balance(qiwi_token, phone):
     # json_data = request.get_json()
     # qiwi_token = json_data.get('token', '')

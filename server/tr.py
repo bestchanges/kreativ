@@ -40,16 +40,27 @@ def start_transaction(buyer_account_uuid, offer_uuid, buyer_from_wallet_uuid, bu
     offer = mongo.db.offer.find_one({'uuid': offer_uuid})
     if not offer:
         raise Exception("not found offer {}".format(offer_uuid))
-    # TODO: check buyer_account owns buyer_*_wallet_uuid
+    if offer['state'] != 'open':
+        raise Exception("Offer {} in not open state '{}'".format(offer_uuid, offer['state']))
 
+
+    # TODO: check buyer_account owns buyer_*_wallet_uuid
+    buyer_from_wallet = mongo.db.wallet.find_one({'uuid': buyer_from_wallet_uuid})
+    if buyer_from_wallet['account_uuid'] != buyer_account_uuid:
+        raise Exception("Security breach! Wallet {} of buyer not belongs to {}".format(buyer_from_wallet, buyer_account_uuid))
     # TODO: check buyer_from_wallet.currency = offer.seller_to_wallet.currency
     # the same for second pair of wallets
 
     # check balance for seller_from_wallet (must have + fee amount)
+
     # check balance for buyer_from_wallet
+    buyer_from_wallet_balance = get_qiwi_balance_for_wallet(buyer_from_wallet)
+    if buyer_from_wallet_balance < payed_amount:
+        raise Exception("Not enought balance on wallet {}. required: {}, available: {}".format(buyer_from_wallet['uuid'], buyer_from_wallet_balance, payed_amount))
 
     # lock offer
-    mongo.db.offer.update_one({'uuid': offer['uuid'] }, { '$set': {'state' 'locked'}})
+    offer['state'] = 'locked'
+    mongo.db.offer.find_one_and_replace({'uuid': offer['uuid'] }, offer)
 
     rate = offer['rate']
     sold_amount = payed_amount / rate
@@ -68,6 +79,9 @@ def start_transaction(buyer_account_uuid, offer_uuid, buyer_from_wallet_uuid, bu
         'payed_amount': payed_amount,
         'rate': '',
     }
-    # find start transfer of RUB part (by currency)
+    # start transfer of RUB from buyer to seller
     # send ETH part reduced by service fee and - network fee
     # send service fee on the wallet - network fee
+
+    offer['state'] = 'open'
+    mongo.db.offer.find_one_and_replace({'uuid': offer['uuid'] }, offer)

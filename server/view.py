@@ -139,7 +139,7 @@ def wallet_balance():
     if wallet['currency'] == ETH:
         balance = get_eth_balance(wallet['address'])
     elif wallet['currency'] == RUB_QIWI:
-        balance = get_qiwi_balance(wallet['api_token'], wallet['address'])
+        balance = get_qiwi_balance_for_wallet(wallet)
     return jsonify(balance)
 
 
