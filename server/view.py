@@ -20,20 +20,21 @@ json_encoder = json.JSONEncoder(indent=4, default=default_encode)
 
 @a.route('/get_offer_list', methods=['GET'], endpoint='get_offer_list')
 def get_offer_list():
-    result = mongo.db.offers.find({'state': 'open', 'locked': False})
-    if not result:
+    results = mongo.db.offers.find({'state': 'open', 'locked': False})
+    if not results:
         raise Exception("Not found offers")
 
-
-
-    return jsonify({'code': 'OK',
-                    'message': 'created'})
+    offers = []
+    for result in results:
+        wallet = mongo.db.offers.find({'uuid': result['seller_from_wallet_uuid']})
+        offers.append({'offer': result, 'wallet': wallet})
+    return json_encoder.encode(offers)
 
 
 @a.route('/create_offer', methods=['POST'], endpoint='create_offer')
 def create_offer():
     json_data = request.get_json()
-    seller_account_uuid = session['account_uuid']
+    seller_account_uuid = json_data.get('seller_account_uuid', '')
     seller_from_wallet_uuid = json_data.get('seller_from_wallet_uuid', '')
 
     data = {
