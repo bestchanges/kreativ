@@ -1,8 +1,8 @@
 import React from 'react'
-import { Router, Route, Link } from 'react-router-dom'
+import { Router, Route } from 'react-router-dom'
 import createBrowserHistory from 'history/createBrowserHistory'
 import { observer } from 'mobx-react'
-import { Layout, Col, Button, Icon, Row } from 'antd'
+import { Layout, Row } from 'antd'
 import styled from 'styled-components'
 
 import {
@@ -11,14 +11,11 @@ import {
   Sell,
   Accounts,
   CreateOffer,
+  OfferList,
+  AcceptOffer,
+  Transaction,
 } from './Pages'
 import { Store } from './Store'
-
-const Logo = styled.span`
-  font-size: 2rem;
-  font-family: futura;
-  color: #fff;
-`
 
 const routes = [
   {
@@ -37,34 +34,51 @@ const routes = [
   }, {
     path: '/create_offer',
     component: observer(CreateOffer)
+  }, {
+    path: '/offer_list',
+    component: observer(OfferList),
+  }, {
+    path: '/accept_offer',
+    component: observer(AcceptOffer),
+  }, {
+    path: '/transaction',
+    component: observer(Transaction),
   }
 ]
 
 const store = new Store()
 const history = createBrowserHistory()
 
-const BackButton = ({ history }) => history.location.pathname !== '/'
-  ? <Button onClick={history.goBack}>
-      <Icon type='left' />Back
-    </Button>
-  : null
+// const BackButton = ({ history }) => history.location.pathname !== '/'
+//   ? <Button onClick={history.goBack}>
+//       <Icon type='left' />Back
+//     </Button>
+//   : null
+
+const FooterWrapper = styled.div`
+  font-family: Futura;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  color: #ffffff;
+`
 
 const App = () =>
   <Router history={history}>
     <Layout className='app'>
-      <Layout.Header>
+      {/* <Layout.Header>
         <Link to='/'><Logo>Creative</Logo></Link>
-      </Layout.Header>
-      <Layout style={{ paddingTop: '2rem' }}>
-        <Row>
+      </Layout.Header> */}
+      <Layout>
+        {/* <Row>
           <Col offset={2} span={20}>
             <Route component={BackButton} />
           </Col>
-        </Row>
+        </Row> */}
         <Row>
-          {routes.map(({ component: Container, ...route }) =>
+          {routes.map(({ component: Container, ...route }, i) =>
             <Route
-              key={route.path}
+              key={i}
               render={
                 (other) => <Container
                   store={store}
@@ -76,7 +90,11 @@ const App = () =>
           )}
         </Row>
       </Layout>
-      <Layout.Footer>© 2018 Actum Digital Hackaton “Creative” team</Layout.Footer>
+      <Layout.Footer>
+        <FooterWrapper>
+          © 2018 Actum Digital Hackaton “Creative” team
+        </FooterWrapper>
+      </Layout.Footer>
     </Layout>
   </Router>
 

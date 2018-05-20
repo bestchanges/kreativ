@@ -45,6 +45,18 @@ export const getAuth = (uuid) =>
 export const createOffer = (options) =>
   post('/create_offer', options)
 
+export const getListOffers = (options) =>
+  get('/list_offers', options)
+
+export const getWalletBalance = (uuid) =>
+  get(`/wallet_balance?wallet_uuid=${uuid}`)
+
+export const createTransaction = (options) =>
+  post('/create_transaction', options)
+
+export const executeTransaction = (options) =>
+  post('/execute_transaction', options)
+
 //   POST /getbalanceqiwi
 // {
 //   'token': token,

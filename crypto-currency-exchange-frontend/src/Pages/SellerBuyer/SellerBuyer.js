@@ -1,15 +1,94 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
-import { Button, Col, Row, Layout } from 'antd'
-import { Link } from 'react-router-dom'
 
-import { localize } from '../../settings'
 import { fetchRates } from '../../utils/api'
+import { formatMoney } from '../../utils'
+import { Head, Center, ButtonGreen } from '../../components'
+import ethLogo from '../../attach/eth_logo.svg'
 
-import { Title } from '../../components'
 
-import { CurrencyInfo } from './CurrencyInfo'
+const Pair = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-top: 66px;
+  font-family: Futura;
+`
 
+const Card = styled.div`
+  width: 380px;
+  height: 300px;
+  background: #fff;
+  transition: .2s background ease;
+  &:hover {
+    background: #f6f6f6;
+  }
+  position: relative;
+  cursor: pointer;
+`
+
+const CustomButton = ButtonGreen.extend`
+  width: 120px;
+  position: absolute;
+  right: 0;
+  bottom: 32px;
+  z-index: 1;
+`
+
+const Info = styled.div`
+  padding: 37px 0 0 60px;
+`
+
+const Title = styled.div`
+  font-size: 36px;
+  font-weight: 500;
+  color: #2a2a2a;
+`
+
+const Amount = styled.div`
+  font-size: 24px;
+  font-weight: 500;
+  color: #2a2a2a;
+  margin-top: 35px;
+  &:after {
+    content: 'for 1 ETH';
+    font-size: 12px;
+    color: #838383;
+    font-weight: 300;
+    padding-left: 8px;
+  }
+`
+
+const Available = styled.div`
+  font-size: 24px;
+  font-weight: 500;
+  color: #2a2a2a;
+  margin-top: 35px;
+  &:before {
+    content: 'Available amount';
+    display: block;
+    font-size: 12px;
+    font-weight: 300;
+    color: #838383;
+  }
+`
+
+const Rubl = styled.div`
+  font-family: Futura;
+  font-size: 64px;
+  font-weight: 300;
+  color: #2a2a2a;
+  position: absolute;
+  right: 24px;
+  top: 2px;
+`
+
+const EthLogo = styled.div`
+  height: 72px;
+  width: 32px;
+  position: absolute;
+  right: 24px;
+  top: 18px;
+`
 
 const fetchTimeout = 30000
 
@@ -44,38 +123,44 @@ class SellerBuyer extends Component {
     })
   }
 
+  toCreateOffer = () => {
+    const { history } = this.props
+    history.push('/create_offer')
+  }
+
+  toListOffer = () => {
+    const { history } = this.props
+    history.push('/offer_list')
+  }
+
   render() {
-    const { rateSell, rateBuy, totalETH, totalRUB } = this.state
+    const { rateSell, rateBuy } = this.state
 
     return (
-      <Row style={{ padding: '2rem 0' }}>
-        <Col span={10} offset={2} style={{ paddingRight: '1rem' }}>
-          <Layout.Content style={{ textAlign: 'right' }}>
-            <Title>{localize.SellerBuyer.sellTitle}</Title>
-            <CurrencyInfo
-              exchangeRate={rateSell}
-              totalAmount={totalRUB}
-              sell
-              right
-              totalAmountCurrency='RUB'
-            />
-            <Link to={'/create_offer'}>
-              <Button size='large' type='primary'>{localize.SellerBuyer.sell}</Button>
-            </Link>
-          </Layout.Content>
-        </Col>
-        <Col span={10} offset={0} style={{ paddingLeft: '1rem' }}>
-          <Layout.Content>
-            <Title>{localize.SellerBuyer.buyTitle}</Title>
-            <CurrencyInfo
-              exchangeRate={rateBuy}
-              totalAmount={totalETH}
-              totalAmountCurrency='ETH'
-            />
-            <Button size='large' type='primary'>{localize.SellerBuyer.buy}</Button>
-          </Layout.Content>
-        </Col>
-      </Row>
+      <Center>
+        <Head>CreativeBase</Head>
+        <Pair>
+          <Card onClick={this.toCreateOffer}>
+            <Info>
+              <Title>Sell Ether</Title>
+              {rateSell && <Amount>{formatMoney(rateSell, 'RUB')}</Amount>}
+            </Info>
+            <CustomButton>Sell</CustomButton>
+            <Rubl>₽</Rubl>
+          </Card>
+          <Card onClick={this.toListOffer}>
+            <Info>
+              <Title>Buy Ether</Title>
+              {rateBuy && <Amount>{formatMoney(rateBuy, 'RUB')}</Amount>}
+              <Available>0₽</Available>
+            </Info>
+            <CustomButton>Buy</CustomButton>
+            <EthLogo>
+              <img src={ethLogo} alt='eth logo' width='100%' height='100%' />
+            </EthLogo>
+          </Card>
+        </Pair>
+      </Center>
     )
   }
 }

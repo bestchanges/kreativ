@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import qr from 'qr-image'
-import { EthLogo } from '../attach'
 
 const Wrapper = styled.div`
   width: 12rem;

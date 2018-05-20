@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Open Sans', 'Segoe UI', 'HelveticaNeue-Light', sans-serif;
+  font-family: 'Futura', 'Open Sans', 'Segoe UI', 'HelveticaNeue-Light', sans-serif;
   font-weight: 300;
 }
 
@@ -18,9 +18,13 @@ body {
 
 .app {
   height: 100%;
+  background-color: #5f19aa !important;
 }
 
 .ant-layout-footer {
-  background: rgb(0, 21, 41);
-  color: #fff;
+  background-color: #5f19aa !important;
+}
+
+.ant-layout .ant-layout {
+  background: none !important;
 }

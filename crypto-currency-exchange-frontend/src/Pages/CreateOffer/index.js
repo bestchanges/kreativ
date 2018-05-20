@@ -8,11 +8,13 @@ class CreateOffer extends React.Component {
 
   createOffer = () => {
     const { store } = this.props
-    const { uuid } = store
+    const { account } = store
 
     createOffer({
       body: JSON.stringify({
-        seller_from_wallet_uuid: uuid,
+        seller_from_wallet_uuid: account.wallets.ETH[0].uuid,
+        seller_account_uuid: account.uuid,
+        seller_to_wallet_uuid: account.wallets['RUB (QIWI)'][0].uuid,
       }),
     }).then(console.log)
   }

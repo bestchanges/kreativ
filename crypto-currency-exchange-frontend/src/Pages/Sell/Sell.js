@@ -6,11 +6,9 @@ import {
   Row,
   Input,
   Button,
-  Icon,
   Form,
   Switch,
 } from 'antd'
-import styled from 'styled-components'
 import { QR, Title } from '../../components'
 import { formatMoney } from '../../utils'
 import { localize } from '../../settings'
