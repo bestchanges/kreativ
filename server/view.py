@@ -1,5 +1,6 @@
 import json
 import time
+from decimal import Decimal
 from uuid import UUID
 
 from bson import ObjectId
@@ -14,45 +15,52 @@ def default_encode(o):
         return str(o)
     if isinstance(o, UUID):
         return str(o)
+    return str(o)
 
 
 json_encoder = json.JSONEncoder(indent=4, default=default_encode)
 
-@a.route('/get_offer_list', methods=['GET'], endpoint='get_offer_list')
-def get_offer_list():
-    result = mongo.db.offers.find({'state': 'open', 'locked': False})
-    if not result:
-        raise Exception("Not found offers")
-
-
-
-    return jsonify({'code': 'OK',
-                    'message': 'created'})
+@a.route('/list_offers', methods=['GET'], endpoint='get_offer_list')
+def list_offers():
+    offers = []
+    for result in mongo.db.offers.find({'state': 'open'}):
+        wallet = mongo.db.wallet.find_one({'uuid': result['seller_from_wallet_uuid']})
+        if not wallet:
+            raise Exception("Not found wallet")
+        wallet=update_balance_for_wallet(wallet)
+        offers.append({'offer': result, 'wallet': wallet})
+    return json_encoder.encode(offers)
 
 
 @a.route('/create_offer', methods=['POST'], endpoint='create_offer')
 def create_offer():
     json_data = request.get_json()
-    seller_account_uuid = session['account_uuid']
+    seller_account_uuid = json_data.get('seller_account_uuid', '')
+    if seller_account_uuid == '':
+        raise Exception("Not found seller_account_uuid")
     seller_from_wallet_uuid = json_data.get('seller_from_wallet_uuid', '')
+    if seller_from_wallet_uuid == '':
+        raise Exception("Not found seller_from_wallet_uuid")
+    seller_to_wallet_uuid = json_data.get('seller_to_wallet_uuid', '')
+    if seller_to_wallet_uuid == '':
+        raise Exception("Not found seller_to_wallet_uuid")
 
+    offer_uuid = str(uuid.uuid4())
     data = {
-        'uuid': uuid.uuid4(),
+        'uuid': offer_uuid,
         'seller_account_uuid': seller_account_uuid,
         'seller_from_wallet_uuid': seller_from_wallet_uuid,
-        'seller_to_wallet_uuid': '',
+        'seller_to_wallet_uuid': seller_to_wallet_uuid,
         'state': 'open',
-        'locked': False,
         'rate': get_rate(ETH, RUB_QIWI),
-        'rate_index': '',
-        'seller_fee': '',
-        'buyer_fee': ''
+        'rate_index': 1,
+        'seller_fee': 0,
+        'buyer_fee': 0
         }
 
     mongo.db.offers.insert(data)
-
-    return jsonify({'code': 'OK',
-                    'message': 'created'})
+    offer = mongo.db.offers.find_one({'uuid': offer_uuid})
+    return json_encoder.encode(offer)
 
 
 @a.route('/list_accounts', methods=['POST', 'GET'])
@@ -66,39 +74,6 @@ def auth_account():
     account = get_account(account_uuid)
     session['account_uuid'] = account_uuid
     return json_encoder.encode(account)
-
-
-@a.route('/sendmoneyqiwi', methods=['POST'], endpoint='send_money_qiwi')
-def send_money_qiwi():
-    json_data = request.get_json()
-    token = json_data.get('token', '')
-    phone = json_data.get('phone', '')
-    amount = json_data.get('amount', '')
-    api_url = 'https://edge.qiwi.com/sinap/api/v2/terms/99/payments'
-
-    headers = {'Content-Type': 'application/json',
-               'Accept': 'application/json',
-               'Authorization': 'Bearer ' + token}
-
-    id = round(time.time() * 100000)
-    data = {'id': str(id),
-            'sum': {
-                'amount': amount,
-                'currency': '643'},
-            'paymentMethod': {
-                'type': 'Account',
-                'accountId': '643'},
-            'comment': 'test',
-            'fields': {
-                'account': phone}}
-
-    response = requests.post(api_url, headers=headers, json=data)
-
-    if response.status_code == 200:
-        return jsonify({'code': 200,
-                        'message': id})
-    else:
-        return response.text
 
 
 @a.route('/createaccount', methods=['POST'], endpoint='create_accounts')
@@ -135,20 +110,41 @@ def sample_accounts():
 def wallet_balance():
     wallet_uuid = request.args.get('wallet_uuid')
     wallet = mongo.db.wallet.find_one({'uuid': wallet_uuid})
-    balance = None
-    if wallet['currency'] == ETH:
-        balance = get_eth_balance(wallet['address'])
-    return jsonify(balance)
+    wallet = update_balance_for_wallet(wallet)
+    return jsonify(wallet['balance'])
 
 
+@a.route('/create_transaction', methods=['GET', 'POST'])
+def create_transaction1():
+    try:
+        json_data = request.get_json()
 
-@a.route('/get_wallet', methods=['POST'])
-def get_address():
-    params = request.get_json()
-    account_uuid = params.get('account')
-    data = create_eth_wallet(account_uuid)
-    # TODO: check account by uuid
+        if json_data:
+            data = json_data
+        else:
+            data = request.args
+        offer_uuid = data.get('offer_uuid')
+        buyer_account_uuid = data.get('account_uuid')
+        buyer_from_wallet_uuid = data.get('from_wallet_uuid')
+        buyer_to_wallet_uuid = data.get('to_wallet_uuid')
+        amount = float(data.get('amount'))
 
-    return jsonify({'address': data['address'], 'uuid': data['uuid']})
+        transaction = create_transaction(buyer_account_uuid, offer_uuid, buyer_from_wallet_uuid, buyer_to_wallet_uuid, amount)
+        return json_encoder.encode(transaction)
+    except Exception as e:
+        return json_encoder.encode({'error': True, 'message': str(e)})
 
+@a.route('/execute_transaction', methods=['GET', 'POST'])
+def execute_transaction1():
+    try:
+        json_data = request.get_json()
+        if json_data:
+            data = json_data
+        else:
+            data = request.args
+        transaction_uuid = data.get('transaction_uuid')
 
+        return json_encoder.encode(execute_transaction(transaction_uuid))
+    except Exception as e:
+        raise e
+        return json_encoder.encode({'error': True, 'message': str(e)})
