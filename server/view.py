@@ -18,15 +18,23 @@ def default_encode(o):
 
 json_encoder = json.JSONEncoder(indent=4, default=default_encode)
 
+@a.route('/get_offer_list', methods=['GET'], endpoint='get_offer_list')
+def get_offer_list():
+    result = mongo.db.offers.find({'state': 'open', 'locked': False})
+    if not result:
+        raise Exception("Not found offers")
+
+
+
+    return jsonify({'code': 'OK',
+                    'message': 'created'})
+
 
 @a.route('/create_offer', methods=['POST'], endpoint='create_offer')
 def create_offer():
     json_data = request.get_json()
-    seller_account_uuid = json_data.get('seller_account_uuid', '')
-    account_uuid = session['account_uuid']
-
+    seller_account_uuid = session['account_uuid']
     seller_from_wallet_uuid = json_data.get('seller_from_wallet_uuid', '')
-
 
     data = {
         'uuid': uuid.uuid4(),
