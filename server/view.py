@@ -1,5 +1,6 @@
 import json
 import time
+from decimal import Decimal
 from uuid import UUID
 
 from bson import ObjectId
@@ -14,6 +15,7 @@ def default_encode(o):
         return str(o)
     if isinstance(o, UUID):
         return str(o)
+    return str(o)
 
 
 json_encoder = json.JSONEncoder(indent=4, default=default_encode)
@@ -39,7 +41,7 @@ def create_offer():
     seller_from_wallet_uuid = json_data.get('seller_from_wallet_uuid', '')
     if seller_from_wallet_uuid == '':
         raise Exception("Not found seller_from_wallet_uuid")
-    seller_to_wallet_uuid = json_data.get('seller_from_wallet_uuid', '')
+    seller_to_wallet_uuid = json_data.get('seller_to_wallet_uuid', '')
     if seller_to_wallet_uuid == '':
         raise Exception("Not found seller_to_wallet_uuid")
 
@@ -112,14 +114,37 @@ def wallet_balance():
     return jsonify(wallet['balance'])
 
 
+@a.route('/create_transaction', methods=['GET', 'POST'])
+def create_transaction1():
+    try:
+        json_data = request.get_json()
 
-@a.route('/get_wallet', methods=['POST'])
-def get_address():
-    params = request.get_json()
-    account_uuid = params.get('account')
-    data = create_eth_wallet(account_uuid)
-    # TODO: check account by uuid
+        if json_data:
+            data = json_data
+        else:
+            data = request.args
+        offer_uuid = data.get('offer_uuid')
+        buyer_account_uuid = data.get('account_uuid')
+        buyer_from_wallet_uuid = data.get('from_wallet_uuid')
+        buyer_to_wallet_uuid = data.get('to_wallet_uuid')
+        amount = float(data.get('amount'))
 
-    return jsonify({'address': data['address'], 'uuid': data['uuid']})
+        transaction = create_transaction(buyer_account_uuid, offer_uuid, buyer_from_wallet_uuid, buyer_to_wallet_uuid, amount)
+        return json_encoder.encode(transaction)
+    except Exception as e:
+        return json_encoder.encode({'error': True, 'message': str(e)})
 
+@a.route('/execute_transaction', methods=['GET', 'POST'])
+def execute_transaction1():
+    try:
+        json_data = request.get_json()
+        if json_data:
+            data = json_data
+        else:
+            data = request.args
+        transaction_uuid = data.get('transaction_uuid')
 
+        return json_encoder.encode(execute_transaction(transaction_uuid))
+    except Exception as e:
+        raise e
+        return json_encoder.encode({'error': True, 'message': str(e)})
