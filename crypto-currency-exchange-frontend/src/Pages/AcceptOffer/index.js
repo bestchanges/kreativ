@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { path } from 'ramda'
+import { Icon } from 'antd'
 import { getWalletBalance, createTransaction } from '../../utils/api'
 import { Offer } from '../OfferList/Offer'
 import { Center, ButtonGreen } from '../../components'
@@ -24,6 +25,7 @@ const QiwiAmount = styled.div`
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
   background-color: #fff;
   padding: 12px;
+  position: relative;
 `
 
 const HelpField = styled.div`
@@ -99,12 +101,14 @@ const InputRight = styled.input`
 
 const EthC = styled.div`
   position: absolute;
+  font-size: 16px;
   left: 13px;
   top: 52px;
 `
 
 const RubC = styled.div`
   position: absolute;
+  font-size: 16px;
   left: 13px;
   top: 16px;
 `
@@ -123,6 +127,24 @@ const TransferIcon = styled.img`
   position: absolute;
   left: 400px;
   top: 35px;
+`
+
+const Refresh = styled.div`
+  position: absolute;
+  height: 100px;
+  right: 0;
+  top: 0;
+  width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f6f6f6;
+  font-size: 30px;
+  cursor: pointer;
+  &:hover .anticon {
+    transform: rotate(3600deg);
+    transition: 15s transform linear;
+  }
 `
 
 class AcceptOffer extends React.Component {
@@ -171,7 +193,7 @@ class AcceptOffer extends React.Component {
     const { uuid: offer_uuid } = offer.offer
     const { uuid: account_uuid } = account
     const from_wallet_uuid = path(['account', 'wallets', 'RUB (QIWI)', 0, 'uuid'], store)
-    const to_wallet_uuid = path(['account', 'wallets', 'RUB (QIWI)', 0, 'uuid'], store)
+    const to_wallet_uuid = path(['account', 'wallets', 'ETH', 0, 'uuid'], store)
 
     createTransaction({
       body: JSON.stringify({
@@ -187,8 +209,20 @@ class AcceptOffer extends React.Component {
     })
   }
 
+  refresh = () => {
+    const { store } = this.props
+    const walletuuid = path(['account', 'wallets', 'RUB (QIWI)', 0, 'uuid'], store)
+
+    getWalletBalance(walletuuid).then(balance => {
+      this.setState({
+        balance
+      })
+    })
+  }
+
   render() {
     const { store } = this.props
+    console.log(store.offer)
     const { balance } = this.state
 
     const inEth = store.offer
@@ -208,8 +242,12 @@ class AcceptOffer extends React.Component {
           <QiwiAmount>
             <QiwiTitle>QIWI balance</QiwiTitle>
             {balance && <QiwiTitle>{balance}₽</QiwiTitle>}
+            <Refresh onClick={this.refresh}>
+              <Icon type='retweet' />
+            </Refresh>
           </QiwiAmount>
-          <HelpField />
+          <HelpField>
+          </HelpField>
         </Row>
         <Exchange>
           <RubC>RUB</RubC>

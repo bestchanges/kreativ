@@ -1,18 +1,28 @@
 import { decorate, observable, transaction } from 'mobx'
 
+const tryJSON = (str) => {
+  try {
+    return JSON.parse(str)
+  } catch(error) {
+    return null
+  }
+}
+
 class StoreClass {
-  walletUUID = null
-  account = null
+  walletUUID = tryJSON(localStorage.getItem('walletUUID'))
+  account = tryJSON(localStorage.getItem('account'))
   wallets = null
-  offer = null
-  transaction_uuid = null
+  offer = tryJSON(localStorage.getItem('offer'))
+  transaction_uuid = tryJSON(localStorage.getItem('transaction_uuid'))
 
   setWalletUUID = (walletUUID) => {
     this.walletUUID = walletUUID
+    localStorage.setItem('walletUUID', JSON.stringify(walletUUID))
   }
 
   setCurrentOffer = (offer) => {
     this.offer = offer
+    localStorage.setItem('offer', JSON.stringify(offer))
   }
 
   clearOffer = () => {
@@ -21,10 +31,12 @@ class StoreClass {
 
   setTransactionUUID  = (uuid) => {
     this.transaction_uuid = uuid
+    localStorage.setItem('transaction_uuid', JSON.stringify(uuid))
   }
 
   setAccount = (account) => {
     this.account = account
+    localStorage.setItem('account', JSON.stringify(account))
   }
 
   clearAccount = () => {

@@ -21,7 +21,7 @@ const Title = styled.div`
 `
 
 const X1 = styled.div`
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   color: #2a2a2a;
 `
